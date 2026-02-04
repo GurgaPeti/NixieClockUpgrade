@@ -1,0 +1,9 @@
+../Core/Src/uartRingBufDMA.c:39:6:Ringbuf_Init	1
+../Core/Src/uartRingBufDMA.c:53:6:Ringbuf_Reset	1
+../Core/Src/uartRingBufDMA.c:68:9:checkString	8
+../Core/Src/uartRingBufDMA.c:109:9:isConfirmed	4
+../Core/Src/uartRingBufDMA.c:124:5:waitFor	15
+../Core/Src/uartRingBufDMA.c:197:5:copyUpto	12
+../Core/Src/uartRingBufDMA.c:254:5:getAfter	4
+../Core/Src/uartRingBufDMA.c:273:6:getDataFromBuffer	10
+../Core/Src/uartRingBufDMA.c:335:6:HAL_UARTEx_RxEventCallback	6
