@@ -1,0 +1,6 @@
+../Core/Src/ESP8266_HAL.c:44:13:uartSend	1
+../Core/Src/ESP8266_HAL.c:49:13:debugLog	1
+../Core/Src/ESP8266_HAL.c:56:5:ESP_Init	9
+../Core/Src/ESP8266_HAL.c:195:5:Server_Send	4
+../Core/Src/ESP8266_HAL.c:222:6:Server_Handle	3
+../Core/Src/ESP8266_HAL.c:251:5:Server_Start	6
