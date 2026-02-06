@@ -242,8 +242,10 @@ int main(void)
 	  ledblink++;
 
 	  if (ledblink>ledload){
+		  if (bcd_to_int(sTime.Hours)>22 || bcd_to_int(sTime.Hours)<5){goto LEDOFF;}//éjjelre led ne villogjon
 		  HAL_GPIO_WritePin(GPIOB, LD3_Pin,1);
 		  HAL_GPIO_WritePin(GPIOA, SEC_LED_Pin,1);
+		  LEDOFF:
 		  if (ledblink>110){HAL_GPIO_WritePin(GPIOB, LD3_Pin,0);HAL_GPIO_WritePin(GPIOA, SEC_LED_Pin,0);ledblink=0;}
 	  }
 
