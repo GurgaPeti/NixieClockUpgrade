@@ -175,26 +175,32 @@ RTC_TimeTypeDef AskTime(void)
 	char timeH[2];
 	char timeM[2];
 	char timeS[2];
+	char dateM[3];
+	char dateY[2];
+	char dateD[2];
 	RTC_TimeTypeDef Time;
+	RTC_DateTypeDef Date;
 
 	uartSend("AT+CIPSNTPTIME?\r\n");
-	while (!(getAfter("+CIPSNTPTIME:", 24, time, 1000)));
+	while (!(getAfter("+CIPSNTPTIME:", 24, time, 1000)));//+CIPSNTPTIME:Tue Oct 19 17:47:56 2021
 	if(isConfirmed(1000) != 1)
 	{
 		debugLog("failed at GetTime\r\n");
-
 	}
 	debugLog("Time--->OK\r\n");
-
 	timeH[0]=time[11];
 	timeH[1]=time[12];
 	timeM[0]=time[14];
 	timeM[1]=time[15];
 	timeS[0]=time[17];
 	timeS[1]=time[18];
-//  Time.Hours =int_to_bcd((atoi(timeH)+1));
-//	Time.Minutes =int_to_bcd(atoi(timeM));
-//	Time.Seconds =int_to_bcd(atoi(timeS));
+	dateY[0]=time[22];
+	dateY[1]=time[23];
+	dateM[0]=time[4];//jan,feb,mar,apr,maj,jun,jul,aug,sep,okt,nov,dec
+	dateM[1]=time[5];
+	dateM[2]=time[6];
+	dateD[0]=time[8];
+	dateD[1]=time[9];
   	Time.Hours =atoi(timeH)+1;
 	Time.Minutes =atoi(timeM);
 	Time.Seconds =atoi(timeS);
