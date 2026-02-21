@@ -42,6 +42,8 @@ char *LED_ON = "<p>LED Status: ON</p><a class=\"button button-off\" href=\"/ledo
 char *LED_OFF = "<p>LED1 Status: OFF</p><a class=\"button button-on\" href=\"/ledon\">ON</a>";
 char *Terminate = "</body></html>";
 
+char *months[]={"Jan","Feb","Mar","Apr","Maj","Jun","Jul","Aug","Sep","Okt","Nov","Dec"};
+
 
 static void uartSend (char *str)
 {
@@ -201,9 +203,17 @@ RTC_TimeTypeDef AskTime(void)
 	dateM[2]=time[6];
 	dateD[0]=time[8];
 	dateD[1]=time[9];
+	//hónap átváltás számra
+    for (int i = 1; i < 13; i++) {
+        if (strcmp(dateM, months[i]) == 0) {//akkor ad vissza nullát, ha a két string egyezik
+            Date.Month= i;
+        }
+    }
   	Time.Hours =atoi(timeH)+1;
 	Time.Minutes =atoi(timeM);
 	Time.Seconds =atoi(timeS);
+	Date.Year=atoi(dateY);
+	Date.Date=atoi(dateD);
 	HAL_Delay(1);//csak debug miatt
 	return Time;
 }

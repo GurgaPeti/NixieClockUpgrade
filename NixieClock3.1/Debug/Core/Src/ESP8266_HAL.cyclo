@@ -1,7 +1,7 @@
-../Core/Src/ESP8266_HAL.c:46:13:uartSend	1
-../Core/Src/ESP8266_HAL.c:51:13:debugLog	1
-../Core/Src/ESP8266_HAL.c:58:5:ESP_Init	9
-../Core/Src/ESP8266_HAL.c:172:17:AskTime	3
-../Core/Src/ESP8266_HAL.c:212:5:Server_Send	4
-../Core/Src/ESP8266_HAL.c:239:6:Server_Handle	3
-../Core/Src/ESP8266_HAL.c:268:5:Server_Start	6
+../Core/Src/ESP8266_HAL.c:48:13:uartSend	1
+../Core/Src/ESP8266_HAL.c:53:13:debugLog	1
+../Core/Src/ESP8266_HAL.c:60:5:ESP_Init	9
+../Core/Src/ESP8266_HAL.c:174:17:AskTime	5
+../Core/Src/ESP8266_HAL.c:222:5:Server_Send	4
+../Core/Src/ESP8266_HAL.c:249:6:Server_Handle	3
+../Core/Src/ESP8266_HAL.c:278:5:Server_Start	6
