@@ -12,6 +12,6 @@
 int ESP_Init (char *SSID, char *PASSWD);
 
 int Server_Start (void);
-RTC_TimeTypeDef AskTime(void);
+RTC_TimeTypeDef AskTime(RTC_DateTypeDef *Date);
 
 #endif /* INC_ESP8266_HAL_H_ */

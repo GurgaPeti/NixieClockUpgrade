@@ -171,7 +171,7 @@ int ESP_Init (char *SSID, char *PASSWD)
 
 }
 
-RTC_TimeTypeDef AskTime(void)
+RTC_TimeTypeDef AskTime(RTC_DateTypeDef *Date)
 {
 	char time[30];
 	char timeH[2];
@@ -181,7 +181,7 @@ RTC_TimeTypeDef AskTime(void)
 	char dateY[2];
 	char dateD[2];
 	RTC_TimeTypeDef Time;
-	RTC_DateTypeDef Date;
+
 
 	uartSend("AT+CIPSNTPTIME?\r\n");
 	while (!(getAfter("+CIPSNTPTIME:", 24, time, 1000)));//+CIPSNTPTIME:Tue Oct 19 17:47:56 2021
@@ -206,14 +206,14 @@ RTC_TimeTypeDef AskTime(void)
 	//hónap átváltás számra
     for (int i = 1; i < 13; i++) {
         if (strcmp(dateM, months[i]) == 0) {//akkor ad vissza nullát, ha a két string egyezik
-            Date.Month= i;
+            Date->Month= i;
         }
     }
   	Time.Hours =atoi(timeH)+1;
 	Time.Minutes =atoi(timeM);
 	Time.Seconds =atoi(timeS);
-	Date.Year=atoi(dateY);
-	Date.Date=atoi(dateD);
+	Date->Year=atoi(dateY);
+	Date->Date=atoi(dateD);
 	HAL_Delay(1);//csak debug miatt
 	return Time;
 }

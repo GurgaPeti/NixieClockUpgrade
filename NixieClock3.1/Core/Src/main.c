@@ -150,7 +150,7 @@ void InitProc(void)
 	 	HAL_GPIO_TogglePin(GPIOB, LD3_Pin);
 	  }
 	  HAL_Delay(1000);
-	  SetRTC(AskTime(),sDate);
+	  SetRTC(AskTime(&sDate),sDate);
 	  HAL_Delay(1000);
 	  ReadRTC();
 }
