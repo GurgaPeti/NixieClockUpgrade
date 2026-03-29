@@ -42,7 +42,7 @@ char *LED_ON = "<p>LED Status: ON</p><a class=\"button button-off\" href=\"/ledo
 char *LED_OFF = "<p>LED1 Status: OFF</p><a class=\"button button-on\" href=\"/ledon\">ON</a>";
 char *Terminate = "</body></html>";
 
-char *months[]={"Jan","Feb","Mar","Apr","Maj","Jun","Jul","Aug","Sep","Okt","Nov","Dec"};
+char *months[]={"nul","Jan","Feb","Mar","Apr","Maj","Jun","Jul","Aug","Sep","Okt","Nov","Dec"};
 
 
 static void uartSend (char *str)
@@ -180,12 +180,13 @@ RTC_TimeTypeDef AskTime(RTC_DateTypeDef *Date)
 	char dateM[3];
 	char dateY[2];
 	char dateD[2];
+	char dateW[3];
 	RTC_TimeTypeDef Time;
 
 
 	uartSend("AT+CIPSNTPTIME?\r\n");
 	while (!(getAfter("+CIPSNTPTIME:", 24, time, 1000)));//+CIPSNTPTIME:Tue Oct 19 17:47:56 2021
-	if(isConfirmed(1000) != 1)
+	if(isConfirmed(1000) != 1)//getAfter miatt innen indul: Tue Oct 19 17:47:56 2021
 	{
 		debugLog("failed at GetTime\r\n");
 	}
@@ -198,22 +199,43 @@ RTC_TimeTypeDef AskTime(RTC_DateTypeDef *Date)
 	timeS[1]=time[18];
 	dateY[0]=time[22];
 	dateY[1]=time[23];
+	dateW[0]=time[0];//Mon,Tue,Wed...
+	dateW[1]=time[1];
+	dateW[2]=time[2];
+	dateW[3] = '\0' ;//strcmp nem működik, ha nem 0-ra végződik a string
 	dateM[0]=time[4];//jan,feb,mar,apr,maj,jun,jul,aug,sep,okt,nov,dec
 	dateM[1]=time[5];
 	dateM[2]=time[6];
+	dateM[3] = '\0' ;//strcmp nem működik, ha nem 0-ra végződik a string
 	dateD[0]=time[8];
 	dateD[1]=time[9];
 	//hónap átváltás számra
     for (int i = 1; i < 13; i++) {
-        if (strcmp(dateM, months[i]) == 0) {//akkor ad vissza nullát, ha a két string egyezik
+        if (!strcmp(dateM, months[i])) {//akkor ad vissza nullát, ha a két string egyezik
             Date->Month= i;
         }
     }
-  	Time.Hours =atoi(timeH)+1;
+  	Time.Hours =atoi(timeH)+1;//+1 GMT+1 időzóna
 	Time.Minutes =atoi(timeM);
 	Time.Seconds =atoi(timeS);
 	Date->Year=atoi(dateY);
 	Date->Date=atoi(dateD);
+//dst kitalálása
+	if (strcmp(dateW,"Sun")==0) {
+	  if (Date->Month == 10) {
+	    if (Date->Date > 31 - 7) {
+	    // last Sunday of the month October, DST = false
+	    //nem csinálunk semmit, ennyi az idő
+	    }
+	  }
+	  if (Date->Month == 3) {
+	    if (Date->Date > 31 - 7) {
+	      // last Sunday of the month March, DST = false
+
+	    	Time.Hours=Time.Hours+1;
+	    }
+	  }
+	}
 	HAL_Delay(1);//csak debug miatt
 	return Time;
 }

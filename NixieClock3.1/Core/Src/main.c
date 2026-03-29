@@ -180,7 +180,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+  DBGMCU->APB1FZR1 |= DBGMCU_APB1FZR1_DBG_IWDG_STOP;//stop watchdog from ruining my debug
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -243,7 +243,7 @@ int main(void)
 
 	  if (ledblink>ledload){
 		  if (bcd_to_int(sTime.Hours)>22 || bcd_to_int(sTime.Hours)<5){goto LEDOFF;}//éjjelre led ne villogjon
-		  HAL_GPIO_WritePin(GPIOB, LD3_Pin,1);
+		 // HAL_GPIO_WritePin(GPIOB, LD3_Pin,1); //zöld led
 		  HAL_GPIO_WritePin(GPIOA, SEC_LED_Pin,1);
 		  LEDOFF:
 		  if (ledblink>110){HAL_GPIO_WritePin(GPIOB, LD3_Pin,0);HAL_GPIO_WritePin(GPIOA, SEC_LED_Pin,0);ledblink=0;}
