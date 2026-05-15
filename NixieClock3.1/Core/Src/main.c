@@ -180,7 +180,8 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  DBGMCU->APB1FZR1 |= DBGMCU_APB1FZR1_DBG_IWDG_STOP;//stop watchdog from ruining my debug
+//  *********************************************************************************************
+//  DBGMCU->APB1FZR1 |= DBGMCU_APB1FZR1_DBG_IWDG_STOP;//stop watchdog from ruining my debug
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -202,14 +203,14 @@ int main(void)
   int ledblink=0;
   int readRTC=0;
   int displaytime=2;
-  int PH=0;
-  int H=0;
+//  int PH=0;
+//  int H=0;
   sDate.WeekDay = 1;
   sDate.Month = 12;
   sDate.Date = 29;
   sDate.Year = 25;
   InitProc();
-  PH=bcd_to_int(sTime.Hours);
+ // PH=bcd_to_int(sTime.Hours);
 
   /* USER CODE END 2 */
 
@@ -228,13 +229,16 @@ int main(void)
 		  HAL_UART_Transmit(&huart2, (uint8_t*)buffer, strlen(buffer), 100);
 
 		  if (bcd_to_int(sTime.Minutes)==13){sTime.Minutes=int_to_bcd(12);}//13talanítás
+
+		  if (bcd_to_int(sTime.Hours)>23 && bcd_to_int(sTime.Minutes)>58){while(1);}//megjavított rtc reset naponta 1x
+		  /*//régi reset
 		  if (bcd_to_int(sTime.Hours)>24){while(1);}//ha 24 óránál többet mutat watchdog reset
 		  H=bcd_to_int(sTime.Hours);
 		  if (H-PH!=0){ 						//ha aktuális óra-előző óra =0 tehát megegyeznek akkor ne csináljon semmit
 			  if(H-PH==1){PH=H;}				//ha aktuális óra- előző óra =1 akkor normál üzem van, lementjük
 			  if(H-PH<0){while(1);}				 //ha aktuális óra- előző óra =negatív szám, akkor watchdog reset
 		  }
-
+		  */
 		  if (bcd_to_int(sTime.Hours)>22 || bcd_to_int(sTime.Hours)<5){displaytime=0;}//kijelző kikapcsolás este 11 után vagyról módosítva
 		  else{displaytime=2;}
 		  readRTC=0;

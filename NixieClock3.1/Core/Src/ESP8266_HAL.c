@@ -13,6 +13,7 @@
 #include "string.h"
 #include "stdlib.h"
 #include "main.h"
+#include "time.h"
 extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart2;
 extern IWDG_HandleTypeDef hiwdg;
@@ -42,8 +43,8 @@ char *LED_ON = "<p>LED Status: ON</p><a class=\"button button-off\" href=\"/ledo
 char *LED_OFF = "<p>LED1 Status: OFF</p><a class=\"button button-on\" href=\"/ledon\">ON</a>";
 char *Terminate = "</body></html>";
 
-char *months[]={"nul","Jan","Feb","Mar","Apr","Maj","Jun","Jul","Aug","Sep","Okt","Nov","Dec"};
-
+char *months[]={"nul","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Okt","Nov","Dec"};
+char *wdays[]={"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
 
 static void uartSend (char *str)
 {
@@ -54,6 +55,47 @@ static void debugLog (char *str)
 {
 	HAL_UART_Transmit(pc_uart, (uint8_t *) str, strlen (str), 1000);
 }
+
+int days_in_month(int month) {
+    switch(month) {
+        case 2: return 28; // ignore leap year for simplicity (or handle it)
+        case 4: case 6: case 9: case 11: return 30;
+        default: return 31;
+    }
+}
+
+int is_last_sunday(int day, int weekday, int month) {
+   // if (weekday != 0) return 0; // not Sunday
+
+    int dim = days_in_month(month);
+
+    return ((day-weekday) + 7 > dim);//elvileg így bármire ami az utolsó vasárnap után van 1-et ad.
+}
+
+int is_dst_eu(int month, int day, int weekday) {
+    if (month < 3 || month > 10)
+        return 0;
+
+    if (month > 3 && month < 10)
+        return 1;
+
+    if (month == 3) {
+        // DST starts on last Sunday
+        if (is_last_sunday(day, weekday, month))
+            return 1;
+        return 0;
+    }
+
+    if (month == 10) {
+        // DST ends on last Sunday
+        if (is_last_sunday(day, weekday, month))
+            return 0;
+        return 1;
+    }
+
+    return 0;
+}
+
 
 /*****************************************************************************************************************************************/
 
@@ -184,6 +226,7 @@ RTC_TimeTypeDef AskTime(RTC_DateTypeDef *Date)
 	RTC_TimeTypeDef Time;
 
 
+
 	uartSend("AT+CIPSNTPTIME?\r\n");
 	while (!(getAfter("+CIPSNTPTIME:", 24, time, 1000)));//+CIPSNTPTIME:Tue Oct 19 17:47:56 2021
 	if(isConfirmed(1000) != 1)//getAfter miatt innen indul: Tue Oct 19 17:47:56 2021
@@ -203,39 +246,36 @@ RTC_TimeTypeDef AskTime(RTC_DateTypeDef *Date)
 	dateW[1]=time[1];
 	dateW[2]=time[2];
 	dateW[3] = '\0' ;//strcmp nem működik, ha nem 0-ra végződik a string
-	dateM[0]=time[4];//jan,feb,mar,apr,maj,jun,jul,aug,sep,okt,nov,dec
+	dateM[0]=time[4];//Jan,Feb,Mar...
 	dateM[1]=time[5];
 	dateM[2]=time[6];
 	dateM[3] = '\0' ;//strcmp nem működik, ha nem 0-ra végződik a string
 	dateD[0]=time[8];
 	dateD[1]=time[9];
+
+
+  	Time.Hours =atoi(timeH)+1;//+1 GMT+1 időzóna
+	Time.Minutes =atoi(timeM);
+	Time.Seconds =atoi(timeS);
+	Date->Year=atoi(dateY);
+	Date->Date=atoi(dateD);
+
 	//hónap átváltás számra
     for (int i = 1; i < 13; i++) {
         if (!strcmp(dateM, months[i])) {//akkor ad vissza nullát, ha a két string egyezik
             Date->Month= i;
         }
     }
-  	Time.Hours =atoi(timeH)+1;//+1 GMT+1 időzóna
-	Time.Minutes =atoi(timeM);
-	Time.Seconds =atoi(timeS);
-	Date->Year=atoi(dateY);
-	Date->Date=atoi(dateD);
-//dst kitalálása
-	if (strcmp(dateW,"Sun")==0) {
-	  if (Date->Month == 10) {
-	    if (Date->Date > 31 - 7) {
-	    // last Sunday of the month October, DST = false
-	    //nem csinálunk semmit, ennyi az idő
-	    }
-	  }
-	  if (Date->Month == 3) {
-	    if (Date->Date > 31 - 7) {
-	      // last Sunday of the month March, DST = false
 
-	    	Time.Hours=Time.Hours+1;
-	    }
-	  }
-	}
+    for (int i = 0; i < 7; i++) {
+        if (!strcmp(dateW, wdays[i])) {//akkor ad vissza nullát, ha a két string egyezik
+            Date->WeekDay= i;
+        }
+    }
+
+
+	if(is_dst_eu(Date->Month, Date->Date, Date->WeekDay))Time.Hours=Time.Hours+1;
+
 	HAL_Delay(1);//csak debug miatt
 	return Time;
 }
